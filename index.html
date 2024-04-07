@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高校智能体TAA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #8ED1FC;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      margin-bottom: 2rem;
+    }
+
+    .carousel {
+      display: flex;
+      width: 100%;
+      height: 60%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+.carousel-item {
+  flex: 0 0 50%; /* 调整轮播图的宽度为容器的50% */
+  margin: auto; /* 自动调整边距使其居中 */
+  scroll-snap-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+    .carousel-item:hover {
+      transform: translateY(-10px);
+    }
+
+    .carousel-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+.overlay-content {
+  width: 80%; /* 将弹窗的宽度扩大两倍 */
+  height: 80%; /* 将弹窗的高度扩大两倍 */
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content iframe {
+  width: 50%; /* 将iframe的宽度调整为原来的一半 */
+  height: 50%; /* 将iframe的高度调整为原来的一半 */
+}
+
+.overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+}
+.overlay-close-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: transparent;
+  color: #fff;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 50px;
+  border-radius: 50%;
+  font-size: 50px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+    .carousel-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .carousel-controls button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 1rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">高校智能体TAA</h1>
+    <div class="carousel">
+      <div class="carousel-item">
+        <img src="image/思维导图.bmp" alt="Image 1">
+      </div>
+      <div class="carousel-item">
+        <img src="image/文转3d.bmp" alt="Image 2">
+      </div>
+      <div class="carousel-item">
+        <img src="image/计组TAA.bmp" alt="Image 3">
+      </div>
+      <div class="carousel-item">
+        <img src="image/小说阅读助手.bmp" alt="Image 4">
+      </div>
+      <div class="carousel-item">
+        <img src="image/代码生3d.bmp" alt="Image 5">
+      </div>
+    </div>
+
+    <div class="carousel-controls">
+      <button id="prev-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+      <button id="next-btn"><i class="fas fa-chevron-right"></i> Next</button>
+    </div>
+  </div>
+
+  <div class="overlay">
+    <div class="overlay-content">
+<div class="overlay-close"><i class="fas fa-times"></i></div>
+    </div>
+<div class="overlay-close-btn">×</div>
+  </div>
+
+  <script>
+    const carouselItems = document.querySelectorAll('.carousel-item');
+    const overlay = document.querySelector('.overlay');
+    const overlayContent = document.querySelector('.overlay-content');
+    const overlayClose = document.querySelector('.overlay-close');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    let currentIndex = 0;
+    const carouselWidth = carouselItems[0].offsetWidth;
+
+    function scrollCarousel(direction) {
+      if (direction === 'left') {
+        currentIndex--;
+        if (currentIndex < 0) {
+          currentIndex = carouselItems.length - 1;
+        }
+      } else {
+        currentIndex++;
+        if (currentIndex >= carouselItems.length) {
+          currentIndex = 0;
+        }
+      }
+      carouselItems[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    }
+
+    carouselItems.forEach((item, index) => {
+  item.addEventListener('click', () => {
+    let iframeSrc = '';
+    switch (index) {
+      case 0:
+        iframeSrc = 'https://mistpe-fastgpt.hf.space/chat/share?shareId=gz5l0gt4lz05e7mlm9ioollt';
+        break;
+      case 1:
+        iframeSrc = 'https://mistpe-fastgpt.hf.space/chat/share?shareId=fitmq70nsqn1fmgi6e14uf55';
+        break;
+      case 2:
+        iframeSrc = 'https://mistpe-fastgpt.hf.space/chat/share?shareId=jtkdujjrgakumrermkahdp5o';
+        break;
+      case 3:
+        iframeSrc = 'https://mistpe-fastgpt.hf.space/chat/share?shareId=9d6yp0z7o9cy30b1d9lj2gd8';
+        break;
+      case 4:
+        iframeSrc = 'https://mistpe-fastgpt.hf.space/chat/share?shareId=gz5l0gt4lz05e7mlm9ioollt';
+        break;
+      // 添加更多的case语句来处理更多的轮播项
+    }
+    overlayContent.innerHTML = '<iframe src="' + iframeSrc + '" style="width: 100%; height: 100%;" frameborder="0" allow="microphone"></iframe>';
+    overlay.classList.add('active');
+document.querySelector('.overlay').classList.add('active');
+  });
+
+});
+
+
+    overlayClose.addEventListener('click', () => {
+      overlay.classList.remove('active');
+    });
+
+    prevBtn.addEventListener('click', () => {
+      scrollCarousel('left');
+    });
+
+    nextBtn.addEventListener('click', () => {
+      scrollCarousel('right');
+    });
+
+    setInterval(() => {
+      scrollCarousel('right');
+    }, 5000);
+
+document.querySelector('.overlay-close-btn').addEventListener('click', function() {
+  document.querySelector('.overlay').classList.remove('active');
+});
+
+
+  </script>
+</body>
+</html>
